@@ -64,6 +64,6 @@ To start the interactive web page:
 python app.py
 ```
 Then, open your web browser and go to:
-👉 **[http://127.0.0.1:5000](http://127.0.0.1:5000)**
+
 
 Enter your text in the text area and click **Detect Emotion** to watch the real-time classification with custom animations and emojis!
