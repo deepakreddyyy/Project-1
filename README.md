@@ -6,7 +6,7 @@ This project contains a complete, beginner-friendly machine learning pipeline, a
 
 ---
 
-## 🚀 Project Features
+## Project Features
 1.  **Text Preprocessing Pipeline**: Automatically cleans text by converting to lowercase, removing noise (punctuation, URLs, handles), tokenizing, removing stopwords, and stemming words to their root form.
 2.  **Model Selection & Training**: Trains and compares **Naive Bayes** and **Logistic Regression** classifiers using both **Bag-of-Words** and **TF-IDF** features.
 3.  **Saved Model**: The best combination (**Logistic Regression + TF-IDF**, achieving **53.46% accuracy** on the 40,000 tweet dataset) is saved for immediate use.
@@ -16,7 +16,7 @@ This project contains a complete, beginner-friendly machine learning pipeline, a
 
 ---
 
-## 📁 Repository Structure
+## Repository Structure
 *   `preprocess.py`: Contains the text cleaning, tokenization, stopword removal, and stemming functions.
 *   `download_data.py`: Downloads the raw CrowdFlower Twitter dataset and prepares the clean dataset.
 *   `train.py`: Preprocesses the data, trains the models, compares feature extraction methods, and exports the best model.
