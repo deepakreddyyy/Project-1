@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered Emotion Detector</title>
+    <!-- Google Fonts for premium typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: rgba(17, 24, 39, 0.7);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --accent-primary: #6366f1;
+            --accent-hover: #4f46e5;
+            
+            /* Emotion Color Systems */
+            --color-happy: #f59e0b;     /* Gold / Yellow */
+            --color-sad: #3b82f6;       /* Blue */
+            --color-angry: #ef4444;     /* Red */
+            --color-surprised: #a855f7; /* Purple */
+            --color-neutral: #14b8a6;   /* Teal */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(168, 85, 247, 0.1) 0%, transparent 40%);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 650px;
+            perspective: 1000px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .header h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            font-weight: 400;
+        }
+
+        /* Glassmorphic Card */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 40px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .card:hover {
+            box-shadow: 0 25px 50px rgba(99, 102, 241, 0.1);
+        }
+
+        /* Text Area Styling */
+        .input-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 120px;
+            background: rgba(10, 15, 30, 0.6);
+            border: 1.5px solid var(--card-border);
+            border-radius: 16px;
+            padding: 16px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 1.05rem;
+            resize: none;
+            outline: none;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        textarea:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2), inset 0 2px 4px rgba(0, 0, 0, 0.2);
+            background: rgba(10, 15, 30, 0.8);
+        }
+
+        textarea::placeholder {
+            color: rgba(156, 163, 175, 0.5);
+        }
+
+        /* Detect Button */
+        button {
+            width: 100%;
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-hover) 100%);
+            border: none;
+            border-radius: 16px;
+            padding: 16px;
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 16px rgba(99, 102, 241, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        button:disabled {
+            background: rgba(55, 65, 81, 0.5);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: none;
+            width: 22px;
+            height: 22px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        /* Result display container */
+        .result-container {
+            margin-top: 35px;
+            display: none;
+            animation: zoomIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .result-card {
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.5s ease;
+        }
+
+        /* Dynamic result themes */
+        .result-card.happy {
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            box-shadow: 0 10px 25px rgba(245, 158, 11, 0.15);
+        }
+        .result-card.sad {
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.15);
+        }
+        .result-card.angry {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            box-shadow: 0 10px 25px rgba(239, 68, 68, 0.15);
+        }
+        .result-card.surprised {
+            background: rgba(168, 85, 247, 0.15);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            box-shadow: 0 10px 25px rgba(168, 85, 247, 0.15);
+        }
+        .result-card.neutral {
+            background: rgba(20, 184, 166, 0.15);
+            border: 1px solid rgba(20, 184, 166, 0.3);
+            box-shadow: 0 10px 25px rgba(20, 184, 166, 0.15);
+        }
+
+        .emoji-box {
+            font-size: 3.5rem;
+            animation: bounce 2s infinite;
+        }
+
+        .emotion-label {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Label custom text colors */
+        .happy .emotion-label { color: var(--color-happy); }
+        .sad .emotion-label { color: var(--color-sad); }
+        .angry .emotion-label { color: var(--color-angry); }
+        .surprised .emotion-label { color: var(--color-surprised); }
+        .neutral .emotion-label { color: var(--color-neutral); }
+
+        .confidence-info {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            max-width: 80%;
+            line-height: 1.4;
+        }
+
+        /* Animations */
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-15px); }
+            60% { transform: translateY(-7px); }
+        }
+
+        footer {
+            margin-top: 40px;
+            color: rgba(156, 163, 175, 0.4);
+            font-size: 0.8rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>Emotion Detector AI</h1>
+            <p>Enter any text below to classify its emotional tone</p>
+        </div>
+
+        <div class="card">
+            <div class="input-group">
+                <label for="text-input" class="input-label">Your Sentence / Paragraph</label>
+                <textarea id="text-input" placeholder="Type how you feel or copy-paste text here... (e.g., 'I am so thrilled and happy with how this project turned out!')"></textarea>
+            </div>
+
+            <button id="detect-btn" onclick="detectEmotion()">
+                <span class="spinner" id="btn-spinner"></span>
+                <span id="btn-text">Detect Emotion</span>
+            </button>
+
+            <!-- Result Section -->
+            <div class="result-container" id="result-sec">
+                <div class="result-card" id="res-card">
+                    <div class="emoji-box" id="res-emoji">😐</div>
+                    <div>
+                        <div class="emotion-label" id="res-emotion">Neutral</div>
+                    </div>
+                    <div class="confidence-info" id="res-desc">
+                        Your text has been analyzed by the Logistic Regression classifier.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            AI-Powered Emotion Detection Project &bull; Built with Flask & Scikit-Learn
+        </footer>
+    </div>
+
+    <script>
+        const emotionData = {
+            happy: { emoji: '😊', desc: 'The AI detected positive, joyful, or enthusiastic tones in your text.' },
+            sad: { emoji: '😢', desc: 'The AI detected sadness, worry, or downhearted expressions in your text.' },
+            angry: { emoji: '😠', desc: 'The AI detected anger, frustration, or hostile sentiments in your text.' },
+            surprised: { emoji: '😲', desc: 'The AI detected surprise, shock, or unexpected tones in your text.' },
+            neutral: { emoji: '😐', desc: 'The AI found the tone of your text to be objective, calm, or matter-of-fact.' }
+        };
+
+        async function detectEmotion() {
+            const inputField = document.getElementById('text-input');
+            const detectBtn = document.getElementById('detect-btn');
+            const btnText = document.getElementById('btn-text');
+            const btnSpinner = document.getElementById('btn-spinner');
+            const resultSec = document.getElementById('result-sec');
+            const resCard = document.getElementById('res-card');
+            const resEmoji = document.getElementById('res-emoji');
+            const resEmotion = document.getElementById('res-emotion');
+            const resDesc = document.getElementById('res-desc');
+
+            const text = inputField.value.trim();
+
+            if (!text) {
+                alert('Please enter some text before detecting.');
+                return;
+            }
+
+            // UI Loading State
+            detectBtn.disabled = true;
+            btnSpinner.style.display = 'inline-block';
+            btnText.textContent = 'Analyzing...';
+            resultSec.style.display = 'none';
+
+            try {
+                // Fetch call to backend API endpoint
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ text: text })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.status === 'success') {
+                    const emotion = data.emotion.toLowerCase();
+                    const details = emotionData[emotion] || emotionData['neutral'];
+
+                    // Update UI with response values
+                    resEmoji.textContent = details.emoji;
+                    resEmotion.textContent = emotion;
+                    resDesc.textContent = details.desc;
+
+                    // Apply matching color-scheme class to the result card
+                    resCard.className = 'result-card ' + emotion;
+                    
+                    // Show result container
+                    resultSec.style.display = 'block';
+                } else {
+                    alert('Error: ' + (data.message || 'Unable to analyze text.'));
+                }
+            } catch (error) {
+                console.error('API Error:', error);
+                alert('Connection error. Make sure the Flask server is running.');
+            } finally {
+                // Restore Button State
+                detectBtn.disabled = false;
+                btnSpinner.style.display = 'none';
+                btnText.textContent = 'Detect Emotion';
+            }
+        }
+    </script>
+</body>
+</html>
