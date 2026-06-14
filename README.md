@@ -30,7 +30,7 @@ This project contains a complete, beginner-friendly machine learning pipeline, a
 
 ---
 
-## 🛠️ How to Run the Project
+## How to Run the Project
 
 ### Step 1: Install Dependencies
 First, install all required Python libraries:
@@ -49,7 +49,7 @@ To train the classifiers and export the best model, run:
 ```bash
 python train.py
 ```
-*(If Matplotlib cannot import due to antivirus security restrictions, the script will output the confusion matrix in a clean text-based format instead of crashing)*.
+
 
 ### Step 4: Run CLI Predictions
 To predict emotions in your terminal:
