@@ -60,10 +60,15 @@ Type any sentence when prompted (e.g. *"I am so happy and excited!"*) and type `
 
 ### Step 5: Launch the Web App
 To start the interactive web page:
+
 ```bash
 python app.py
 ```
+
 Then, open your web browser and go to:
 
+```text
+http://127.0.0.1:5000
+```
 
 Enter your text in the text area and click **Detect Emotion** to watch the real-time classification with custom animations and emojis!
